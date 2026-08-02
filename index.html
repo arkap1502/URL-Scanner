@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>URL Threat Scanner (Starter)</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2300e5ff'/%3E%3Cstop offset='1' stop-color='%23ff2d2d'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M50 4 L92 22 V50 C92 76 74 92 50 98 C26 92 8 76 8 50 V22 Z' fill='%230d1117' stroke='url(%23g)' stroke-width='5'/%3E%3Cpath d='M32 50 L45 63 L70 36' fill='none' stroke='url(%23g)' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
@@ -91,6 +92,68 @@
       }
     }
 
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
+
+    .logo-mark {
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 10px rgba(0,229,255,0.5)) drop-shadow(0 0 14px rgba(255,45,45,0.4));
+      animation: logoFloat 4s ease-in-out infinite;
+    }
+
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-4px) rotate(2deg); }
+    }
+
+    .stat-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .stat-chip {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      color: #e8ecf1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(0,229,255,0.25);
+      border-radius: 20px;
+      padding: 6px 14px 6px 10px;
+    }
+
+    .stat-chip .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 1.8s infinite;
+    }
+
+    .stat-chip.red .dot {
+      background: var(--red);
+      box-shadow: 0 0 6px var(--red);
+    }
+
+    .stat-chip.amber .dot {
+      background: var(--amber);
+      box-shadow: 0 0 6px var(--amber);
+    }
+
     h1{
       font-size:60px;
       font-weight:900;
@@ -137,21 +200,28 @@
     }
 
     .scanbar button {
-      background: cyan;
+      background: linear-gradient(90deg, #00e5ff, #ff2d2d);
       color: #000;
       font-size: 18px;
       font-weight: 800;
+      letter-spacing: .04em;
       padding: 0 28px;
       border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 16px rgba(0,229,255,0.35), 0 0 22px rgba(255,45,45,0.25);
+      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
     }
 
     .scanbar button:hover {
-      filter: brightness(1.08);
+      filter: brightness(1.12);
+      transform: translateY(-1px);
+      box-shadow: 0 0 22px rgba(0,229,255,0.5), 0 0 30px rgba(255,45,45,0.4);
     }
 
     .scanbar button:disabled {
       opacity: .5;
       cursor: default;
+      transform: none;
     }
 
 
@@ -191,6 +261,77 @@
       gap: 8px;
       flex-wrap: wrap;
     }
+
+    .copy-btn {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--line);
+      color: var(--dim);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      padding: 7px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all .15s;
+      flex-shrink: 0;
+    }
+
+    .copy-btn:hover {
+      color: #00e5ff;
+      border-color: rgba(0,229,255,0.4);
+    }
+
+    .copy-btn.copied {
+      color: var(--green);
+      border-color: rgba(63,185,80,0.4);
+    }
+
+    .history-row {
+      margin-top: 14px;
+      display: none;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .history-row.active {
+      display: flex;
+    }
+
+    .history-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--dim);
+      letter-spacing: .08em;
+      margin-right: 2px;
+    }
+
+    .hist-chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      font-weight: 700;
+      border-radius: 20px;
+      padding: 5px 12px 5px 10px;
+      cursor: pointer;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all .15s;
+    }
+
+    .hist-chip .hist-score {
+      font-size: 10px;
+      opacity: .85;
+    }
+
+    .hist-chip.sev-high-b { border: 1px solid rgba(255,77,79,.35); color: var(--red); }
+    .hist-chip.sev-medium-b { border: 1px solid rgba(255,176,32,.35); color: var(--amber); }
+    .hist-chip.sev-low-b { border: 1px solid rgba(63,185,80,.35); color: var(--green); }
+
+    .hist-chip:hover { filter: brightness(1.3); }
 
     .ex-chip {
       font-family: 'JetBrains Mono', monospace;
@@ -398,11 +539,28 @@
   <div class="wrap">
     <header>
       <div class="eyebrow">Signal Analysis · Client-Side</div>
-      <h1>URL Threat Scanner</h1>
+      <div class="brand-row">
+        <svg class="logo-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#00e5ff"/>
+              <stop offset="1" stop-color="#ff2d2d"/>
+            </linearGradient>
+          </defs>
+          <path d="M50 4 L92 22 V50 C92 76 74 92 50 98 C26 92 8 76 8 50 V22 Z" fill="#0d1117" stroke="url(#logoGrad)" stroke-width="5"/>
+          <path d="M32 50 L45 63 L70 36" fill="none" stroke="url(#logoGrad)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h1>URL Threat Scanner</h1>
+      </div>
       <p class="sub">Paste a link below to run it through a structural and lexical
         threat model — the same class of checks browsers and mail filters run
         before a page ever loads. Nothing is sent anywhere; analysis runs
         entirely in this tab.</p>
+      <div class="stat-row">
+        <span class="stat-chip"><span class="dot"></span>100% CLIENT-SIDE</span>
+        <span class="stat-chip amber"><span class="dot"></span>ZERO DATA SENT</span>
+        <span class="stat-chip red"><span class="dot"></span>9 THREAT SIGNALS</span>
+      </div>
     </header>
 
     <div class="scanbar">
@@ -420,6 +578,13 @@
       <button class="ex-chip" onclick="loadExample('http://192.168.10.4/webscr/login')">raw-IP sample</button>
       <button class="ex-chip" onclick="loadExample('https://accounts.google.xn--80ak6aa92e/signin')">punycode
         sample</button>
+      <button class="ex-chip" onclick="loadExample('http://bit.ly/3xK9zLp')">shortener sample</button>
+      <button class="ex-chip" onclick="loadExample('http://secure-chase-login-verify-account.top')">hyphen/TLD
+        sample</button>
+    </div>
+
+    <div class="history-row" id="historyRow">
+      <span class="history-label">RECENT:</span>
     </div>
 
     <div id="report">
@@ -437,6 +602,7 @@
           <div class="verdict" id="verdictText">—</div>
           <div class="verdict-sub" id="urlEcho"></div>
         </div>
+        <button class="copy-btn" id="copyBtn" onclick="copyReport()" title="Copy report as text">COPY</button>
       </div>
       <div class="findings" id="findings"></div>
     </div>
@@ -513,29 +679,29 @@
 
       // ---- STEP 1: Raw IP address check ----
       if (/^(\d{1,3}\.){3}\d{1,3}$/.test(host)) {
-        add(25, "Hostname is a raw IP address (${host}) instead of a domain name", "high");
+        add(25, `Hostname is a raw IP address (${host}) instead of a domain name`, "high");
       }
 
 
       // ---- STEP 2: HTTPS check ----
   if (parsed.protocol !== "https:") {
-        add(10, "URL does not use HTTPS (${parsed.protocol})", "medium");
+        add(10, `URL does not use HTTPS (${parsed.protocol})`, "medium");
       }
 
       // ---- STEP 3: '@' symbol check ----
   if (url.includes('@')) {
-        add(20, "URL contains '@' symbol","high");
+        add(20, "URL contains '@' symbol", "high");
       }
 
       // ---- STEP 4: URL length check ----
   if (url.length > 75) {
-        add(5, "URL is unusually long (${url.length} characters)", "medium");
+        add(5, `URL is unusually long (${url.length} characters)`, "medium");
       }
 
       // ---- STEP 5: Hyphens & subdomain nesting ----
       const hyphens = (host.match(/-/g) || []).length;
       if (hyphens >= 3) {
-        add(10, "Domain contains ${hyphens} hyphens (common in fake lookalike domains)", "medium");
+        add(10, `Domain contains ${hyphens} hyphens (common in fake lookalike domains)`, "medium");
       } else if (hyphens >= 1 && KNOWN_BRANDS.some(b => host.includes(b))) {
         add(8, "Hyphenated domain combined with a brand-name keyword", "medium");
       }
@@ -543,7 +709,7 @@
       const labels = host.split(".");
       const subCount = Math.max(0, labels.length - 2);
       if (subCount >= 3) {
-        add(15, "Excessive subdomain nesting (${subCount} levels) — a common cloaking technique", "medium");
+        add(15, `Excessive subdomain nesting (${subCount} levels) — a common cloaking technique`, "medium");
       }
 
       // ---- STEP 6: Typosquat detection (uses levenshtein + KNOWN_BRANDS) ----
@@ -559,11 +725,11 @@
             if (d < bestDist) { bestDist = d; best = c; }
           }
           if (bestDist > 0 && bestDist <= 2 && best.length >= 4) {
-            add(30, "Domain contains '${best}', closely resembling known brand '${brand}' (edit distance ${bestDist}) — likely typosquatting", "high");
+            add(30, `Domain contains '${best}', closely resembling known brand '${brand}' (edit distance ${bestDist}) — likely typosquatting`, "high");
             break;
           }
           if (host.includes(brand) && core !== brand) {
-            add(18, "Brand name '${brand}' embedded in a domain that isn't the brand's actual domain", "high");
+            add(18, `Brand name '${brand}' embedded in a domain that isn't the brand's actual domain`, "high");
             break;
           }
         }
@@ -574,17 +740,17 @@
       const coreLabel = labels[0] || "";
       const ent = entropy(coreLabel);
       if (ent > 3.8 && coreLabel.length > 8) {
-        add(8, "Subdomain/label '${coreLabel}' has high randomness (entropy ${ent.toFixed(2)}) — resembles auto-generated phishing infrastructure", "low");
+        add(8, `Subdomain/label '${coreLabel}' has high randomness (entropy ${ent.toFixed(2)}) — resembles auto-generated phishing infrastructure`, "low");
       }
 
       // ---- STEP 8: Shortener / suspicious TLD / suspicious keywords ----
       if (URL_SHORTENERS.includes(host)) {
-        add(12, "URL uses a link-shortening service (${host}) which hides the true destination", "medium");
+        add(12, `URL uses a link-shortening service (${host}) which hides the true destination`, "medium");
       }
 
       for (const tld of SUSPICIOUS_TLDS) {
         if (host.endsWith(tld)) {
-          add(8, "Domain uses a TLD frequently abused for phishing (${tld})", "low");
+          add(8, `Domain uses a TLD frequently abused for phishing (${tld})`, "low");
           break;
         }
       }
@@ -592,7 +758,7 @@
       const pathQuery = decodeURIComponent(parsed.pathname + "?" + parsed.search).toLowerCase();
       const hits = [...new Set(SUSPICIOUS_KEYWORDS.filter(k => host.includes(k) || pathQuery.includes(k)))];
       if (hits.length) {
-        add(Math.min(15, 4 * hits.length), "Contains urgency/credential-harvesting keywords: ${hits.slice(0, 5).join(", ")}", "medium");
+        add(Math.min(15, 4 * hits.length), `Contains urgency/credential-harvesting keywords: ${hits.slice(0, 5).join(", ")}`, "medium");
       }
       
       // ---- STEP 9: Punycode / non-standard port ----
@@ -624,6 +790,9 @@
     // ============================================================
     // UI WIRING — already complete, do not need to edit
     // ============================================================
+    let lastResult = null;
+    let scanHistory = [];
+
     function loadExample(u) {
       document.getElementById('urlInput').value = u;
       runScan();
@@ -643,10 +812,12 @@
         btn.disabled = false; btn.textContent = "SCAN";
         if (result.error) { alert(result.error); return; }
         renderReport(result);
+        addToHistory(result);
       }, 650);
     }
 
     function renderReport(result) {
+      lastResult = result;
       document.getElementById('report').style.display = 'block';
       document.getElementById('urlEcho').textContent = result.displayUrl;
 
@@ -680,6 +851,62 @@
     
     `;
         container.appendChild(row);
+      });
+    }
+
+    function severityBucket(score) {
+      if (score >= 40) return 'high';
+      if (score >= 15) return 'medium';
+      return 'low';
+    }
+
+    function addToHistory(result) {
+      // de-dupe by URL, most recent first, cap at 6
+      scanHistory = scanHistory.filter(h => h.displayUrl !== result.displayUrl);
+      scanHistory.unshift(result);
+      if (scanHistory.length > 6) scanHistory.length = 6;
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const row = document.getElementById('historyRow');
+      row.querySelectorAll('.hist-chip').forEach(c => c.remove());
+      if (scanHistory.length === 0) { row.classList.remove('active'); return; }
+      row.classList.add('active');
+      scanHistory.forEach(h => {
+        const bucket = severityBucket(h.score);
+        const chip = document.createElement('button');
+        chip.className = `hist-chip sev-${bucket}-b`;
+        let host;
+        try { host = new URL(h.displayUrl).hostname; } catch (e) { host = h.displayUrl; }
+        chip.innerHTML = `${host} <span class="hist-score">${h.score}</span>`;
+        chip.onclick = () => { document.getElementById('urlInput').value = h.displayUrl; runScan(); };
+        row.appendChild(chip);
+      });
+    }
+
+    function copyReport() {
+      if (!lastResult) return;
+      const lines = [
+        `URL Threat Scanner Report`,
+        `Target: ${lastResult.displayUrl}`,
+        `Score: ${lastResult.score}/100`,
+        `Verdict: ${lastResult.verdict}`,
+        ``,
+        `Findings:`,
+        ...(lastResult.findings.length
+          ? lastResult.findings.map(f => `  [${f.sev.toUpperCase()}] +${f.points}  ${f.reason}`)
+          : ['  None detected'])
+      ];
+      const text = lines.join('\n');
+      const btn = document.getElementById('copyBtn');
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'COPIED';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 1500);
+      }).catch(() => {
+        btn.textContent = 'FAILED';
+        setTimeout(() => { btn.textContent = 'COPY'; }, 1500);
       });
     }
 
