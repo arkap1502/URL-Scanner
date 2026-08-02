@@ -29,11 +29,19 @@
       margin:0;
       padding:0;
       min-height:100vh;
-
-      background: url("https://wallpapercave.com/wp/wp1913256.jpg") center center/cover no-repeat fixed;
       background-color:#000;
-
       color:#fff;
+      overflow-x:hidden;
+    }
+
+    #bgCanvas{
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      display: block;
+      background: radial-gradient(ellipse at 50% 40%, #1a0505 0%, #000000 70%);
     }
 
     .wrap{
@@ -385,6 +393,7 @@
 </head>
 
 <body>
+  <canvas id="bgCanvas"></canvas>
   <div class="wrap">
     <header>
       <div class="eyebrow">Signal Analysis · Client-Side</div>
@@ -676,6 +685,211 @@
     document.getElementById('urlInput').addEventListener('keydown', e => {
       if (e.key === 'Enter') runScan();
     });
+  </script>
+
+  <script>
+    // ============================================================
+    // 3D "ROGUE AI CORE" BACKGROUND ANIMATION (canvas, no deps)
+    // Wireframe globe + pulsing red core + drifting embers + glitch scanlines
+    // ============================================================
+    (function () {
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      let W, H, CX, CY;
+
+      const RED = '255,45,45';
+      const RED_DIM = '150,20,20';
+      const EMBER = '255,120,40';
+
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+        CX = W / 2;
+        CY = H / 2;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      function rand(min, max) { return min + Math.random() * (max - min); }
+
+      // ---- wireframe globe (lat/long grid) ----
+      const GLOBE_R = 260;
+      const LAT_STEPS = 10;
+      const LON_STEPS = 16;
+      const SEG = 40; // segments per ring for smoothness
+      const rings = []; // each ring: array of {x,y,z}
+
+      for (let i = 1; i < LAT_STEPS; i++) {
+        const phi = (i / LAT_STEPS) * Math.PI; // 0..PI
+        const ringR = GLOBE_R * Math.sin(phi);
+        const y = GLOBE_R * Math.cos(phi);
+        const pts = [];
+        for (let s = 0; s <= SEG; s++) {
+          const theta = (s / SEG) * Math.PI * 2;
+          pts.push({ x: ringR * Math.cos(theta), y, z: ringR * Math.sin(theta) });
+        }
+        rings.push(pts);
+      }
+      for (let j = 0; j < LON_STEPS; j++) {
+        const theta = (j / LON_STEPS) * Math.PI * 2;
+        const pts = [];
+        for (let s = 0; s <= SEG; s++) {
+          const phi = (s / SEG) * Math.PI;
+          pts.push({
+            x: GLOBE_R * Math.sin(phi) * Math.cos(theta),
+            y: GLOBE_R * Math.cos(phi),
+            z: GLOBE_R * Math.sin(phi) * Math.sin(theta)
+          });
+        }
+        rings.push(pts);
+      }
+
+      // ---- drifting embers/particles ----
+      const EMBER_COUNT = 90;
+      const FIELD_R = 640;
+      let embers = [];
+      function makeEmber() {
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(rand(-1, 1));
+        const r = rand(GLOBE_R * 1.15, FIELD_R);
+        return {
+          x: r * Math.sin(phi) * Math.cos(theta),
+          y: r * Math.sin(phi) * Math.sin(theta),
+          z: r * Math.cos(phi),
+          pulse: Math.random() * Math.PI * 2,
+          pulseSpeed: rand(0.015, 0.045),
+          drift: { x: rand(-0.15, 0.15), y: rand(-0.15, 0.15), z: rand(-0.15, 0.15) }
+        };
+      }
+      for (let i = 0; i < EMBER_COUNT; i++) embers.push(makeEmber());
+
+      let mouseX = 0, mouseY = 0, targetRotY = 0, targetRotX = 0;
+      let rotY = 0.4, rotX = 0.15;
+      window.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX / W) - 0.5;
+        mouseY = (e.clientY / H) - 0.5;
+        targetRotY = mouseX * 0.7;
+        targetRotX = mouseY * 0.4;
+      });
+
+      const FOV = 720;
+      function project(p, extraRotY) {
+        let x = p.x, y = p.y, z = p.z;
+        const ry = rotY + (extraRotY || 0);
+        let cosY = Math.cos(ry), sinY = Math.sin(ry);
+        let x1 = x * cosY - z * sinY;
+        let z1 = x * sinY + z * cosY;
+
+        let cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+        let y1 = y * cosX - z1 * sinX;
+        let z2 = y * sinX + z1 * cosX;
+
+        const depth = z2 + FIELD_R + FOV;
+        const scale = FOV / depth;
+        return { sx: CX + x1 * scale, sy: CY + y1 * scale, scale, z: z2 };
+      }
+
+      let t = 0;
+      let flicker = 1;
+      let glitchTimer = 0;
+
+      function tick() {
+        t++;
+        rotY += (targetRotY - rotY) * 0.02 + 0.0016; // slow constant rotation
+        rotX += (targetRotX - rotX) * 0.02;
+
+        ctx.clearRect(0, 0, W, H);
+
+        // near-black base with faint red vignette breathing
+        flicker += (Math.random() - 0.5) * 0.06;
+        flicker = Math.max(0.7, Math.min(1, flicker));
+        const grad = ctx.createRadialGradient(CX, CY, 0, CX, CY, Math.max(W, H) * 0.75);
+        grad.addColorStop(0, `rgba(40,4,4,${0.35 * flicker})`);
+        grad.addColorStop(0.55, 'rgba(6,0,0,0.7)');
+        grad.addColorStop(1, 'rgba(0,0,0,0.95)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+
+        // pulsing core glow at center
+        const corePulse = 0.6 + 0.4 * Math.sin(t * 0.05);
+        const coreGrad = ctx.createRadialGradient(CX, CY, 0, CX, CY, 140);
+        coreGrad.addColorStop(0, `rgba(${RED},${0.9 * corePulse})`);
+        coreGrad.addColorStop(0.4, `rgba(${RED_DIM},${0.35 * corePulse})`);
+        coreGrad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = coreGrad;
+        ctx.beginPath();
+        ctx.arc(CX, CY, 140, 0, Math.PI * 2);
+        ctx.fill();
+
+        // wireframe globe
+        ctx.lineWidth = 1;
+        for (const ring of rings) {
+          ctx.beginPath();
+          let started = false;
+          let avgZ = 0;
+          const pts = ring.map(p => { const pr = project(p); avgZ += pr.z; return pr; });
+          avgZ /= pts.length;
+          const alpha = Math.max(0.05, Math.min(0.5, 0.5 - avgZ / 900));
+          ctx.strokeStyle = `rgba(${RED},${alpha})`;
+          for (const pr of pts) {
+            if (!started) { ctx.moveTo(pr.sx, pr.sy); started = true; }
+            else ctx.lineTo(pr.sx, pr.sy);
+          }
+          ctx.stroke();
+        }
+
+        // embers
+        for (const n of embers) {
+          n.x += n.drift.x; n.y += n.drift.y; n.z += n.drift.z;
+          const d = Math.sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
+          if (d > FIELD_R || d < GLOBE_R * 1.05) {
+            n.drift.x *= -1; n.drift.y *= -1; n.drift.z *= -1;
+          }
+          n.pulse += n.pulseSpeed;
+        }
+        const projectedEmbers = embers.map(n => ({ n, p: project(n) })).sort((a, b) => a.p.z - b.p.z);
+        for (const { n, p } of projectedEmbers) {
+          if (p.scale <= 0) continue;
+          const glow = 0.5 + 0.5 * Math.sin(n.pulse);
+          const size = Math.max(0.6, 1.6 * p.scale);
+          const useEmber = ((n.pulse * 7) | 0) % 5 === 0;
+          const color = useEmber ? EMBER : RED;
+
+          const r2 = ctx.createRadialGradient(p.sx, p.sy, 0, p.sx, p.sy, size * 6);
+          r2.addColorStop(0, `rgba(${color},${0.85 * glow})`);
+          r2.addColorStop(1, `rgba(${color},0)`);
+          ctx.fillStyle = r2;
+          ctx.beginPath();
+          ctx.arc(p.sx, p.sy, size * 6, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = `rgba(${color},${0.95 * glow})`;
+          ctx.beginPath();
+          ctx.arc(p.sx, p.sy, size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // scanlines
+        ctx.fillStyle = 'rgba(255,30,30,0.025)';
+        for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1);
+
+        // occasional horizontal glitch tear
+        glitchTimer--;
+        if (glitchTimer <= 0 && Math.random() < 0.02) {
+          glitchTimer = 40 + Math.random() * 120;
+          const gy = Math.random() * H;
+          const gh = rand(4, 18);
+          const shift = rand(-24, 24);
+          const slice = ctx.getImageData(0, gy, W, gh);
+          ctx.putImageData(slice, shift, gy);
+          ctx.fillStyle = `rgba(${RED},0.08)`;
+          ctx.fillRect(0, gy, W, gh);
+        }
+
+        requestAnimationFrame(tick);
+      }
+      tick();
+    })();
   </script>
 </body>
 
