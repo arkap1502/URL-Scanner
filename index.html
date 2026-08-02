@@ -92,13 +92,14 @@
     }
 
     h1{
-      color:white;
       font-size:60px;
       font-weight:900;
-      text-shadow:
-          0 0 10px cyan,
-          0 0 20px cyan,
-          0 0 40px cyan;
+      background: linear-gradient(90deg, #00e5ff 0%, #4d7fff 30%, #b83bff 55%, #ff2d55 80%, #ff2d2d 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 12px rgba(0,229,255,0.55)) drop-shadow(0 0 18px rgba(255,45,45,0.45));
     }
 
     .sub {
