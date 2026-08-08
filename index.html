@@ -52,6 +52,10 @@
       display: block;
       pointer-events: none;
       background: radial-gradient(ellipse at 50% 40%, #1a0505 0%, #000000 70%);
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+      backface-visibility: hidden;
+      will-change: transform;
     }
 
     .wrap{
@@ -1321,15 +1325,34 @@
         return 1;
       }
 
-      function resize() {
+      let lastW = 0, lastH = 0;
+      let resizeTimer = null;
+
+      function doResize() {
         W = canvas.width = window.innerWidth;
         H = canvas.height = window.innerHeight;
         CX = W / 2;
         CY = H / 2;
+        lastW = W; lastH = H;
         sceneScale = computeSceneScale();
         if (typeof EMBER_COUNT !== 'undefined') {
           activeEmberCount = W < 700 ? Math.round(EMBER_COUNT * 0.55) : EMBER_COUNT;
         }
+      }
+
+      // Mobile browsers fire 'resize' when the address bar hides/shows while
+      // scrolling — reacting to that resets the canvas backing store and makes
+      // the background visibly jump mid-scroll. Only resize when the width
+      // actually changes or the height changes by more than typical toolbar
+      // height, and coalesce bursts of events into one.
+      function resize() {
+        const newW = window.innerWidth;
+        const newH = window.innerHeight;
+        const widthChanged = newW !== lastW;
+        const heightChanged = Math.abs(newH - lastH) > 150;
+        if (!widthChanged && !heightChanged && lastW !== 0) return;
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(doResize, 80);
       }
 
       function rand(min, max) { return min + Math.random() * (max - min); }
@@ -1386,7 +1409,7 @@
       for (let i = 0; i < EMBER_COUNT; i++) embers.push(makeEmber());
 
       window.addEventListener('resize', resize);
-      resize();
+      doResize();
 
       let mouseX = 0, mouseY = 0, targetRotY = 0, targetRotX = 0;
       let rotY = 0.4, rotX = 0.15;
