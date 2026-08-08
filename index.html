@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Sentinel AI — Advanced URL Threat Scanner</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2300e5ff'/%3E%3Cstop offset='1' stop-color='%23ff2d2d'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M50 4 L92 22 V50 C92 76 74 92 50 98 C26 92 8 76 8 50 V22 Z' fill='%230d1117' stroke='url(%23g)' stroke-width='5'/%3E%3Cpath d='M32 50 L45 63 L70 36' fill='none' stroke='url(%23g)' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <style>
@@ -26,10 +27,17 @@
       padding: 0;
     }
 
+    html {
+      width: 100%;
+      min-height: 100%;
+    }
+
     body{
       margin:0;
       padding:0;
-      min-height:100vh;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
       background-color:#000;
       color:#fff;
       overflow-x:hidden;
@@ -38,21 +46,27 @@
     #bgCanvas{
       position: fixed;
       inset: 0;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       z-index: -1;
       display: block;
+      pointer-events: none;
       background: radial-gradient(ellipse at 50% 40%, #1a0505 0%, #000000 70%);
     }
 
     .wrap{
-      max-width:1100px;
-      width:95%;
-      margin:40px auto;
+      width: 100%;
+      max-width: none;
+      margin: 0;
       background: transparent;
-      border:none;
-      padding:35px;
+      border: none;
+      min-height: 100vh;
+      min-height: 100dvh;
       height: auto;
+      padding: clamp(20px, 3vw, 55px);
+      padding-left: max(clamp(20px, 3vw, 55px), env(safe-area-inset-left));
+      padding-right: max(clamp(20px, 3vw, 55px), env(safe-area-inset-right));
+      padding-bottom: max(clamp(20px, 3vw, 55px), env(safe-area-inset-bottom));
     }
 
     header {
@@ -95,14 +109,15 @@
     .brand-row {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 14px;
       margin-top: 10px;
       margin-bottom: 4px;
     }
 
     .logo-mark {
-      width: 52px;
-      height: 52px;
+      width: clamp(38px, 4vw, 64px);
+      height: clamp(38px, 4vw, 64px);
       flex-shrink: 0;
       filter: drop-shadow(0 0 10px rgba(0,229,255,0.5)) drop-shadow(0 0 14px rgba(255,45,45,0.4));
       animation: logoFloat 4s ease-in-out infinite;
@@ -155,7 +170,8 @@
     }
 
     h1{
-      font-size:60px;
+      font-size: clamp(2rem, 4.5vw, 4.5rem);
+      line-height: 1.08;
       font-weight:900;
       background: linear-gradient(90deg, #00e5ff 0%, #4d7fff 30%, #b83bff 55%, #ff2d55 80%, #ff2d2d 100%);
       -webkit-background-clip: text;
@@ -167,30 +183,34 @@
 
     .sub {
       color: #ffffff;
-      font-size: 18px;
+      font-size: clamp(14px, 1.6vw, 18px);
       font-weight: 700;
       line-height: 1.6;
+      max-width: 900px;
+      overflow-wrap: anywhere;
+    }
+
+    .scanbar {
+      display: flex;
+      width: 100%;
+      align-items: stretch;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(0,229,255,0.4);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 18px rgba(0,229,255,0.08);
     }
 
     .scanbar input {
       flex: 1;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid cyan;
-      color: #ffffff;
-      font-size: 18px;
-      font-weight: 700;
-      padding: 14px 16px;
-    }
-
-    .scanbar input {
-      flex: 1;
+      min-width: 0;
       background: transparent;
       width: 100%;
       border: 0;
       outline: 0;
       color: var(--ink);
       font-family: 'JetBrains Mono', monospace;
-      font-size: 18px;
+      font-size: clamp(14px, 1.6vw, 18px);
       font-weight: 700;
       padding: 15px 20px;
     }
@@ -200,13 +220,16 @@
     }
 
     .scanbar button {
+      flex-shrink: 0;
+      min-width: 120px;
       background: linear-gradient(90deg, #00e5ff, #ff2d2d);
       color: #000;
-      font-size: 18px;
+      font-size: clamp(14px, 1.6vw, 18px);
       font-weight: 800;
       letter-spacing: .04em;
       padding: 0 28px;
-      border-radius: 8px;
+      border: 0;
+      border-radius: 0;
       cursor: pointer;
       box-shadow: 0 0 16px rgba(0,229,255,0.35), 0 0 22px rgba(255,45,45,0.25);
       transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
@@ -224,35 +247,21 @@
       transform: none;
     }
 
+    @media (max-width: 700px) {
+      .scanbar {
+        flex-direction: column;
+        border-radius: 10px;
+      }
 
-    .verdict {
-        color: white;
-        font-size: 24px;
-        font-weight: 900;
-   }
+      .scanbar input,
+      .scanbar button {
+        width: 100%;
+        min-height: 52px;
+      }
 
-    .verdict-sub {
-        color: white;
-        font-size: 16px;
-        font-weight: 700;
-    }
-
-    .f-text {
-        color: white;
-        font-size: 16px;
-        font-weight: 700;
-    }
-
-    .gauge-num {
-        color: white;
-        font-size: 28px;
-        font-weight: 900;
-    }
-
-    footer {
-        color: white;
-        font-size: 15px;
-        font-weight: 700;
+      .scanbar input {
+        border-bottom: 1px solid rgba(0,229,255,0.25);
+      }
     }
 
     .examples {
@@ -384,6 +393,7 @@
 
     #report {
       margin-top: 36px;
+      width: 100%;
       display: none;
     }
 
@@ -391,10 +401,12 @@
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 12px;
-      padding: 26px;
+      padding: clamp(18px, 2.5vw, 26px);
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 24px;
+      width: 100%;
     }
 
     .gauge {
@@ -421,13 +433,14 @@
     }
 
     .verdict-block {
-      flex: 1;
+      flex: 1 1 240px;
+      min-width: 0;
     }
 
     .verdict {
       font-family: 'JetBrains Mono', monospace;
       font-weight: 700;
-      font-size: 17px;
+      font-size: clamp(15px, 1.6vw, 17px);
       letter-spacing: .01em;
     }
 
@@ -435,7 +448,8 @@
       color: var(--dim);
       font-size: 13px;
       margin-top: 4px;
-      word-break: break-all;
+      overflow-wrap: anywhere;
+      word-break: break-word;
       font-family: 'JetBrains Mono', monospace;
     }
 
@@ -444,11 +458,13 @@
       display: flex;
       flex-direction: column;
       gap: 0;
+      width: 100%;
     }
 
     .finding {
       display: flex;
-      gap: 14px;
+      flex-wrap: wrap;
+      gap: 8px 14px;
       padding: 14px 4px;
       border-bottom: 1px solid var(--line);
       opacity: 0;
@@ -496,10 +512,14 @@
     }
 
     .f-text {
+      flex: 1 1 240px;
+      min-width: 0;
       font-size: 13.5px;
       line-height: 1.5;
       color: var(--ink);
       padding-top: 2px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .f-points {
@@ -520,10 +540,11 @@
 
     .ai-summary {
       margin-top: 18px;
+      width: 100%;
       background: linear-gradient(180deg, rgba(0,229,255,0.06), rgba(255,45,45,0.03));
       border: 1px solid rgba(0,229,255,0.22);
       border-radius: 10px;
-      padding: 18px 20px;
+      padding: clamp(14px, 2vw, 20px);
       display: flex;
       gap: 14px;
       align-items: flex-start;
@@ -545,7 +566,7 @@
       box-shadow: 0 0 14px rgba(0,229,255,0.45);
     }
 
-    .ai-summary-body { flex: 1; }
+    .ai-summary-body { flex: 1; min-width: 0; }
 
     .ai-summary-label {
       font-family: 'JetBrains Mono', monospace;
@@ -555,6 +576,7 @@
       text-transform: uppercase;
       margin-bottom: 6px;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 8px;
     }
@@ -567,19 +589,26 @@
 
     .ai-summary-text {
       color: #e8ecf1;
-      font-size: 14px;
+      font-size: clamp(13px, 1.4vw, 14px);
       line-height: 1.65;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .cat-grid {
       margin-top: 18px;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 12px;
+      width: 100%;
     }
 
-    @media (max-width: 720px) {
-      .cat-grid { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 1000px) {
+      .cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 600px) {
+      .cat-grid { grid-template-columns: minmax(0, 1fr); }
     }
 
     .cat-box {
@@ -587,6 +616,7 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 12px 14px;
+      min-width: 0;
     }
 
     .cat-label {
@@ -596,7 +626,9 @@
       color: var(--dim);
       text-transform: uppercase;
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
+      gap: 4px;
       margin-bottom: 8px;
     }
 
@@ -625,6 +657,7 @@
       color: var(--dim);
       letter-spacing: .06em;
       margin-top: 10px;
+      overflow-wrap: anywhere;
     }
 
     .engine-badge b { color: #7fdcff; }
@@ -632,15 +665,62 @@
     footer {
       margin-top: 40px;
       color: var(--dim);
-      font-size: 12px;
+      font-size: clamp(11px, 1.2vw, 12px);
       line-height: 1.7;
       font-family: 'JetBrains Mono', monospace;
       border-top: 1px solid var(--line);
       padding-top: 18px;
+      padding-bottom: max(0px, env(safe-area-inset-bottom));
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     footer b {
       color: #8b94a0;
+    }
+  </style>
+  <style>
+    /* ============================================================
+       RESPONSIVE BREAKPOINTS
+       Large desktop: >=1600px · Desktop: 1024-1599 · Tablet: 768-1023
+       Mobile: <768 · Small mobile: <480
+       ============================================================ */
+
+    @media (min-width: 1600px) {
+      .wrap { padding-left: 5vw; padding-right: 5vw; }
+      .sub { max-width: 1000px; }
+      .gauge-row { gap: 32px; }
+    }
+
+    @media (max-width: 1023px) {
+      .wrap { padding-top: clamp(24px, 4vw, 40px); }
+      .stat-chip { font-size: 11px; padding: 6px 12px 6px 9px; }
+    }
+
+    @media (max-width: 767px) {
+      header { margin-bottom: 24px; }
+      .gauge-row { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .gauge-row .copy-btn { align-self: stretch; text-align: center; }
+      .verdict-block { flex: 1 1 100%; }
+      .ex-chip {
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 14px;
+      }
+      .hist-chip { min-height: 36px; }
+      .examples, .history-row { gap: 10px; }
+    }
+
+    @media (max-width: 479px) {
+      .eyebrow { font-size: 10px; }
+      .stat-chip { font-size: 10px; }
+      .verdict { font-size: 14.5px; }
+      .ai-summary { flex-direction: column; }
+      .ai-summary .ai-icon { align-self: flex-start; }
+      .gauge { width: 84px; height: 84px; }
+      .gauge svg { width: 84px; height: 84px; }
+      .gauge-num { font-size: 19px; }
     }
   </style>
 </head>
@@ -1224,19 +1304,33 @@
       const canvas = document.getElementById('bgCanvas');
       const ctx = canvas.getContext('2d');
       let W, H, CX, CY;
+      let sceneScale = 1;
+      let activeEmberCount = 0;
 
       const RED = '255,45,45';
       const RED_DIM = '150,20,20';
       const EMBER = '255,120,40';
+
+      // Scale the whole scene down on smaller viewports so the globe/embers
+      // stay proportionate and cheaper to render on mobile.
+      function computeSceneScale() {
+        const minDim = Math.min(W, H);
+        if (minDim < 480) return 0.5;
+        if (minDim < 700) return 0.68;
+        if (minDim < 1100) return 0.85;
+        return 1;
+      }
 
       function resize() {
         W = canvas.width = window.innerWidth;
         H = canvas.height = window.innerHeight;
         CX = W / 2;
         CY = H / 2;
+        sceneScale = computeSceneScale();
+        if (typeof EMBER_COUNT !== 'undefined') {
+          activeEmberCount = W < 700 ? Math.round(EMBER_COUNT * 0.55) : EMBER_COUNT;
+        }
       }
-      window.addEventListener('resize', resize);
-      resize();
 
       function rand(min, max) { return min + Math.random() * (max - min); }
 
@@ -1291,6 +1385,9 @@
       }
       for (let i = 0; i < EMBER_COUNT; i++) embers.push(makeEmber());
 
+      window.addEventListener('resize', resize);
+      resize();
+
       let mouseX = 0, mouseY = 0, targetRotY = 0, targetRotX = 0;
       let rotY = 0.4, rotX = 0.15;
       window.addEventListener('mousemove', (e) => {
@@ -1302,7 +1399,7 @@
 
       const FOV = 720;
       function project(p, extraRotY) {
-        let x = p.x, y = p.y, z = p.z;
+        let x = p.x * sceneScale, y = p.y * sceneScale, z = p.z * sceneScale;
         const ry = rotY + (extraRotY || 0);
         let cosY = Math.cos(ry), sinY = Math.sin(ry);
         let x1 = x * cosY - z * sinY;
@@ -1366,8 +1463,9 @@
           ctx.stroke();
         }
 
-        // embers
-        for (const n of embers) {
+        // embers (only update/render the active subset on smaller viewports)
+        const liveEmbers = activeEmberCount > 0 ? embers.slice(0, activeEmberCount) : embers;
+        for (const n of liveEmbers) {
           n.x += n.drift.x; n.y += n.drift.y; n.z += n.drift.z;
           const d = Math.sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
           if (d > FIELD_R || d < GLOBE_R * 1.05) {
@@ -1375,7 +1473,7 @@
           }
           n.pulse += n.pulseSpeed;
         }
-        const projectedEmbers = embers.map(n => ({ n, p: project(n) })).sort((a, b) => a.p.z - b.p.z);
+        const projectedEmbers = liveEmbers.map(n => ({ n, p: project(n) })).sort((a, b) => a.p.z - b.p.z);
         for (const { n, p } of projectedEmbers) {
           if (p.scale <= 0) continue;
           const glow = 0.5 + 0.5 * Math.sin(n.pulse);
