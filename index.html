@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>URL Threat Scanner (Starter)</title>
+  <title>Sentinel AI — Advanced URL Threat Scanner</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2300e5ff'/%3E%3Cstop offset='1' stop-color='%23ff2d2d'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M50 4 L92 22 V50 C92 76 74 92 50 98 C26 92 8 76 8 50 V22 Z' fill='%230d1117' stroke='url(%23g)' stroke-width='5'/%3E%3Cpath d='M32 50 L45 63 L70 36' fill='none' stroke='url(%23g)' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap');
@@ -518,6 +518,117 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
+    .ai-summary {
+      margin-top: 18px;
+      background: linear-gradient(180deg, rgba(0,229,255,0.06), rgba(255,45,45,0.03));
+      border: 1px solid rgba(0,229,255,0.22);
+      border-radius: 10px;
+      padding: 18px 20px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .ai-summary .ai-icon {
+      width: 30px;
+      height: 30px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00e5ff, #ff2d2d);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 900;
+      font-size: 13px;
+      color: #05080d;
+      box-shadow: 0 0 14px rgba(0,229,255,0.45);
+    }
+
+    .ai-summary-body { flex: 1; }
+
+    .ai-summary-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: .12em;
+      color: #7fdcff;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ai-summary-label .conf {
+      color: var(--dim);
+      letter-spacing: .04em;
+      font-weight: 400;
+    }
+
+    .ai-summary-text {
+      color: #e8ecf1;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .cat-grid {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 720px) {
+      .cat-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .cat-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+
+    .cat-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: .06em;
+      color: var(--dim);
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .cat-label b {
+      color: #e8ecf1;
+      font-weight: 700;
+    }
+
+    .cat-bar-track {
+      height: 5px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+
+    .cat-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      width: 0%;
+      transition: width .7s ease, background .3s;
+    }
+
+    .engine-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--dim);
+      letter-spacing: .06em;
+      margin-top: 10px;
+    }
+
+    .engine-badge b { color: #7fdcff; }
+
     footer {
       margin-top: 40px;
       color: var(--dim);
@@ -538,7 +649,7 @@
   <canvas id="bgCanvas"></canvas>
   <div class="wrap">
     <header>
-      <div class="eyebrow">Signal Analysis · Client-Side</div>
+      <div class="eyebrow">AI Threat Intelligence Engine · Client-Side</div>
       <div class="brand-row">
         <svg class="logo-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -550,16 +661,18 @@
           <path d="M50 4 L92 22 V50 C92 76 74 92 50 98 C26 92 8 76 8 50 V22 Z" fill="#0d1117" stroke="url(#logoGrad)" stroke-width="5"/>
           <path d="M32 50 L45 63 L70 36" fill="none" stroke="url(#logoGrad)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <h1>URL Threat Scanner</h1>
+        <h1>Sentinel AI · URL Scanner</h1>
       </div>
-      <p class="sub">Paste a link below to run it through a structural and lexical
-        threat model — the same class of checks browsers and mail filters run
-        before a page ever loads. Nothing is sent anywhere; analysis runs
-        entirely in this tab.</p>
+      <p class="sub">Paste a link below and Sentinel runs it through a multi-model
+        heuristic engine — domain reputation, structural anomalies, lexical
+        content, and encoding/obfuscation analysis — the same class of signals
+        browsers and mail filters weigh before a page ever loads. Nothing is
+        sent anywhere; every check runs entirely in this tab.</p>
       <div class="stat-row">
         <span class="stat-chip"><span class="dot"></span>100% CLIENT-SIDE</span>
         <span class="stat-chip amber"><span class="dot"></span>ZERO DATA SENT</span>
-        <span class="stat-chip red"><span class="dot"></span>9 THREAT SIGNALS</span>
+        <span class="stat-chip red"><span class="dot"></span>20+ THREAT SIGNALS</span>
+        <span class="stat-chip"><span class="dot"></span>4 DETECTION MODELS</span>
       </div>
     </header>
 
@@ -580,6 +693,10 @@
         sample</button>
       <button class="ex-chip" onclick="loadExample('http://bit.ly/3xK9zLp')">shortener sample</button>
       <button class="ex-chip" onclick="loadExample('http://secure-chase-login-verify-account.top')">hyphen/TLD
+        sample</button>
+      <button class="ex-chip" onclick="loadExample('http://0xC0.0xA8.0x01.0x01/wp-admin/update.php')">hex-IP
+        sample</button>
+      <button class="ex-chip" onclick="loadExample('https://mail-redirect.io/click?redirect=http://totally-legit-bank.ru/login')">open-redirect
         sample</button>
     </div>
 
@@ -604,29 +721,78 @@
         </div>
         <button class="copy-btn" id="copyBtn" onclick="copyReport()" title="Copy report as text">COPY</button>
       </div>
+
+      <div class="ai-summary">
+        <div class="ai-icon">AI</div>
+        <div class="ai-summary-body">
+          <div class="ai-summary-label">SENTINEL ANALYSIS <span class="conf" id="confText">confidence —</span></div>
+          <div class="ai-summary-text" id="aiSummaryText">—</div>
+        </div>
+      </div>
+
+      <div class="cat-grid" id="catGrid">
+        <div class="cat-box" data-cat="domain">
+          <div class="cat-label">Domain Reputation <b id="catNum-domain">0</b></div>
+          <div class="cat-bar-track"><div class="cat-bar-fill" id="catBar-domain"></div></div>
+        </div>
+        <div class="cat-box" data-cat="structure">
+          <div class="cat-label">Structural <b id="catNum-structure">0</b></div>
+          <div class="cat-bar-track"><div class="cat-bar-fill" id="catBar-structure"></div></div>
+        </div>
+        <div class="cat-box" data-cat="content">
+          <div class="cat-label">Lexical / Content <b id="catNum-content">0</b></div>
+          <div class="cat-bar-track"><div class="cat-bar-fill" id="catBar-content"></div></div>
+        </div>
+        <div class="cat-box" data-cat="encoding">
+          <div class="cat-label">Encoding / Obfuscation <b id="catNum-encoding">0</b></div>
+          <div class="cat-bar-track"><div class="cat-bar-fill" id="catBar-encoding"></div></div>
+        </div>
+      </div>
+      <div class="engine-badge">Engine: <b>Sentinel Heuristic Core v3</b> — 4 weighted detection models, <span id="signalCount">0</span> signals evaluated</div>
+
       <div class="findings" id="findings"></div>
     </div>
 
     <footer>
-      <b>Scope:</b> this scanner performs URL-structure analysis only (no live page
+      <b>Scope:</b> Sentinel performs URL-structure analysis only (no live page
       fetch, due to browser CORS restrictions) — checks for typosquatting, IP-literal
-      hosts, punycode/homograph encoding, credential-harvesting keywords, excessive
-      subdomains, and known shortener/TLD abuse patterns. It is a teaching /
-      triage tool, not a substitute for a maintained threat-intel feed.
+      and obfuscated-IP hosts, punycode/homograph encoding, mixed-script domains,
+      credential-harvesting keywords, dangerous file extensions, open-redirect
+      parameters, excessive subdomains, and known shortener/TLD abuse patterns.
+      <br><b>How "AI" is used:</b> the score is produced by a deterministic,
+      weighted multi-model heuristic engine (four categories shown above), and
+      the analysis text is template-generated from the triggered signals — the
+      same rule-based approach real filters use, styled as an AI console. It is
+      a teaching / triage tool, not a live ML classifier or a substitute for a
+      maintained threat-intel feed.
     </footer>
   </div>
 
   <script>
 
 
-    // Reference data you'll use in your checks (already provided):
+    // Reference data used across the four detection models
     const KNOWN_BRANDS = ["google", "paypal", "microsoft", "apple", "amazon", "facebook",
       "instagram", "netflix", "bankofamerica", "wellsfargo", "chase", "linkedin", "twitter",
-      "whatsapp", "dropbox", "adobe", "outlook", "office365", "icloud", "coinbase", "binance", "steam"];
+      "whatsapp", "dropbox", "adobe", "outlook", "office365", "icloud", "coinbase", "binance",
+      "steam", "meta", "citibank", "hsbc", "americanexpress", "usps", "fedex", "ups", "dhl",
+      "irs", "docusign", "zoom", "spotify"];
 
-    const SUSPICIOUS_TLDS = [".zip", ".mov", ".xyz", ".top", ".club", ".gq", ".tk", ".ml", ".ga", ".cf", ".work", ".click", ".link", ".loan", ".win"];
-    const URL_SHORTENERS = ["bit.ly", "tinyurl.com", "t.co", "goo.gl", "ow.ly", "is.gd", "buff.ly", "rebrand.ly", "cutt.ly", "shorte.st"];
-    const SUSPICIOUS_KEYWORDS = ["login", "signin", "verify", "account", "secure", "update", "confirm", "banking", "webscr", "password", "invoice", "billing", "suspend", "unlock", "alert", "urgent", "limited", "recovery"];
+    const SUSPICIOUS_TLDS = [".zip", ".mov", ".xyz", ".top", ".club", ".gq", ".tk", ".ml", ".ga",
+      ".cf", ".work", ".click", ".link", ".loan", ".win", ".men", ".rest", ".cam", ".sbs", ".icu", ".cyou"];
+    const URL_SHORTENERS = ["bit.ly", "tinyurl.com", "t.co", "goo.gl", "ow.ly", "is.gd", "buff.ly",
+      "rebrand.ly", "cutt.ly", "shorte.st", "t.ly", "rb.gy", "shorturl.at"];
+    const SUSPICIOUS_KEYWORDS = ["login", "signin", "verify", "account", "secure", "update", "confirm",
+      "banking", "webscr", "password", "invoice", "billing", "suspend", "unlock", "alert", "urgent",
+      "limited", "recovery", "wallet", "gift-card", "reward", "verify-identity", "support"];
+    const DANGEROUS_EXTENSIONS = [".exe", ".scr", ".bat", ".cmd", ".msi", ".apk", ".jar", ".vbs",
+      ".ps1", ".lnk", ".jse", ".wsf", ".hta", ".dmg", ".pkg"];
+    const REDIRECT_PARAMS = ["url", "redirect", "redirect_uri", "redirecturl", "next", "return",
+      "returnto", "return_to", "dest", "destination", "target", "continue", "goto", "out", "u"];
+
+    // Category weighting model — every finding is tagged with one of these
+    const CATEGORY_LABELS = { domain: "Domain Reputation", structure: "Structural", content: "Lexical / Content", encoding: "Encoding / Obfuscation" };
+    const TOTAL_CHECKS = 20;
 
     function levenshtein(a, b) {
       if (a === b) return 0;
@@ -675,45 +841,69 @@
 
       const host = (parsed.hostname || "").toLowerCase();
       const findings = [];
-      const add = (points, reason, sev) => findings.push({ points, reason, sev });
+      const add = (points, reason, sev, cat) => findings.push({ points, reason, sev, cat });
 
-      // ---- STEP 1: Raw IP address check ----
+      // ---- MODEL: STRUCTURE — dangerous / non-standard scheme ----
+      if (["data:", "javascript:", "file:", "blob:", "vbscript:"].includes(parsed.protocol)) {
+        add(28, `URL uses a non-standard, potentially dangerous scheme (${parsed.protocol})`, "high", "structure");
+      }
+
+      // ---- MODEL: STRUCTURE — raw IP address check ----
       if (/^(\d{1,3}\.){3}\d{1,3}$/.test(host)) {
-        add(25, `Hostname is a raw IP address (${host}) instead of a domain name`, "high");
+        add(25, `Hostname is a raw IP address (${host}) instead of a domain name`, "high", "structure");
       }
 
-
-      // ---- STEP 2: HTTPS check ----
-  if (parsed.protocol !== "https:") {
-        add(10, `URL does not use HTTPS (${parsed.protocol})`, "medium");
+      // ---- MODEL: ENCODING — obfuscated IP formats (hex / decimal / octal) ----
+      // Checked against the RAW input text: the WHATWG URL parser silently
+      // normalizes these notations to dotted-decimal in parsed.hostname, so
+      // by the time we reach `host` the obfuscation is already gone.
+      const rawAuthority = url.replace(/^\w+:\/\//, "").split(/[\/?#]/)[0];
+      const rawHost = rawAuthority.split("@").pop().split(":")[0].toLowerCase();
+      const rawLabels = rawHost.split(".");
+      const isHexOctet = l => /^0x[0-9a-f]{1,2}$/i.test(l);
+      const isOctalOctet = l => /^0[0-7]{2,3}$/.test(l);
+      if (/^0x[0-9a-f]+$/i.test(rawHost)) {
+        add(22, `Hostname is a single hexadecimal-encoded IP address (resolves to ${host}) — used to evade IP-literal filters`, "high", "encoding");
+      } else if (rawLabels.length === 4 && rawLabels.every(isHexOctet)) {
+        add(22, `Hostname is a per-octet hex-encoded IP address (resolves to ${host}) — used to evade IP-literal filters`, "high", "encoding");
+      } else if (rawLabels.length === 4 && rawLabels.every(isOctalOctet)) {
+        add(20, `Hostname is an octal-encoded IP address (resolves to ${host}) — used to evade IP-literal filters`, "high", "encoding");
+      } else if (/^\d{7,10}$/.test(rawHost)) {
+        add(20, `Hostname is a decimal-encoded IP address (resolves to ${host}) — used to evade IP-literal filters`, "high", "encoding");
       }
 
-      // ---- STEP 3: '@' symbol check ----
-  if (url.includes('@')) {
-        add(20, "URL contains '@' symbol", "high");
+      // ---- MODEL: STRUCTURE — HTTPS check ----
+      const DANGEROUS_SCHEMES = ["data:", "javascript:", "file:", "blob:", "vbscript:"];
+      if (parsed.protocol !== "https:" && !DANGEROUS_SCHEMES.includes(parsed.protocol)) {
+        add(10, `URL does not use HTTPS (${parsed.protocol})`, "medium", "structure");
       }
 
-      // ---- STEP 4: URL length check ----
-  if (url.length > 75) {
-        add(5, `URL is unusually long (${url.length} characters)`, "medium");
+      // ---- MODEL: STRUCTURE — '@' symbol check ----
+      if (url.includes('@')) {
+        add(20, "URL contains '@' symbol — browsers ignore everything before it, hiding the true host", "high", "structure");
       }
 
-      // ---- STEP 5: Hyphens & subdomain nesting ----
+      // ---- MODEL: STRUCTURE — URL length check ----
+      if (url.length > 75) {
+        add(5, `URL is unusually long (${url.length} characters)`, "medium", "structure");
+      }
+
+      // ---- MODEL: STRUCTURE — hyphens & subdomain nesting ----
       const hyphens = (host.match(/-/g) || []).length;
       if (hyphens >= 3) {
-        add(10, `Domain contains ${hyphens} hyphens (common in fake lookalike domains)`, "medium");
+        add(10, `Domain contains ${hyphens} hyphens (common in fake lookalike domains)`, "medium", "structure");
       } else if (hyphens >= 1 && KNOWN_BRANDS.some(b => host.includes(b))) {
-        add(8, "Hyphenated domain combined with a brand-name keyword", "medium");
+        add(8, "Hyphenated domain combined with a brand-name keyword", "medium", "structure");
       }
 
       const labels = host.split(".");
       const subCount = Math.max(0, labels.length - 2);
       if (subCount >= 3) {
-        add(15, `Excessive subdomain nesting (${subCount} levels) — a common cloaking technique`, "medium");
+        add(15, `Excessive subdomain nesting (${subCount} levels) — a common cloaking technique`, "medium", "structure");
       }
 
-      // ---- STEP 6: Typosquat detection (uses levenshtein + KNOWN_BRANDS) ----
-       if (labels.length >= 2) {
+      // ---- MODEL: DOMAIN — typosquat detection (levenshtein + KNOWN_BRANDS) ----
+      if (labels.length >= 2) {
         const core = labels[labels.length - 2]; // e.g. "paypa1" in paypa1.tk
         const chunks = core.split("-").filter(Boolean);
         for (const brand of KNOWN_BRANDS) {
@@ -725,52 +915,108 @@
             if (d < bestDist) { bestDist = d; best = c; }
           }
           if (bestDist > 0 && bestDist <= 2 && best.length >= 4) {
-            add(30, `Domain contains '${best}', closely resembling known brand '${brand}' (edit distance ${bestDist}) — likely typosquatting`, "high");
+            add(30, `Domain contains '${best}', closely resembling known brand '${brand}' (edit distance ${bestDist}) — likely typosquatting`, "high", "domain");
             break;
           }
           if (host.includes(brand) && core !== brand) {
-            add(18, `Brand name '${brand}' embedded in a domain that isn't the brand's actual domain`, "high");
+            add(18, `Brand name '${brand}' embedded in a domain that isn't the brand's actual domain`, "high", "domain");
             break;
           }
         }
       }
 
-
-      // ---- STEP 7: Entropy check (uses entropy() + first label) ----
+      // ---- MODEL: ENCODING — entropy check on first label ----
       const coreLabel = labels[0] || "";
       const ent = entropy(coreLabel);
       if (ent > 3.8 && coreLabel.length > 8) {
-        add(8, `Subdomain/label '${coreLabel}' has high randomness (entropy ${ent.toFixed(2)}) — resembles auto-generated phishing infrastructure`, "low");
+        add(8, `Subdomain/label '${coreLabel}' has high randomness (entropy ${ent.toFixed(2)}) — resembles auto-generated phishing infrastructure`, "low", "encoding");
       }
 
-      // ---- STEP 8: Shortener / suspicious TLD / suspicious keywords ----
+      // ---- MODEL: ENCODING — digit-dense label (algorithmically generated domains) ----
+      if (coreLabel.length >= 6) {
+        const digitRatio = (coreLabel.match(/\d/g) || []).length / coreLabel.length;
+        if (digitRatio > 0.4) {
+          add(7, `Domain label '${coreLabel}' is unusually digit-dense (${Math.round(digitRatio * 100)}%) — a pattern seen in auto-generated domains`, "low", "encoding");
+        }
+      }
+
+      // ---- MODEL: DOMAIN — shortener / suspicious TLD ----
       if (URL_SHORTENERS.includes(host)) {
-        add(12, `URL uses a link-shortening service (${host}) which hides the true destination`, "medium");
+        add(12, `URL uses a link-shortening service (${host}) which hides the true destination`, "medium", "domain");
       }
 
       for (const tld of SUSPICIOUS_TLDS) {
         if (host.endsWith(tld)) {
-          add(8, `Domain uses a TLD frequently abused for phishing (${tld})`, "low");
+          add(8, `Domain uses a TLD frequently abused for phishing (${tld})`, "low", "domain");
           break;
         }
       }
 
+      // ---- MODEL: CONTENT — urgency / credential-harvesting keywords ----
       const pathQuery = decodeURIComponent(parsed.pathname + "?" + parsed.search).toLowerCase();
       const hits = [...new Set(SUSPICIOUS_KEYWORDS.filter(k => host.includes(k) || pathQuery.includes(k)))];
       if (hits.length) {
-        add(Math.min(15, 4 * hits.length), `Contains urgency/credential-harvesting keywords: ${hits.slice(0, 5).join(", ")}`, "medium");
-      }
-      
-      // ---- STEP 9: Punycode / non-standard port ----
-      if (host.startsWith("xn--") || host.includes(".xn--")) {
-        add(20, "Domain uses Punycode (xn--) encoding — can be used to spoof lookalike characters (IDN homograph attack)", "high");
+        add(Math.min(15, 4 * hits.length), `Contains urgency/credential-harvesting keywords: ${hits.slice(0, 5).join(", ")}`, "medium", "content");
       }
 
+      // ---- MODEL: CONTENT — dangerous file extension in path ----
+      const pathLower = parsed.pathname.toLowerCase();
+      const dangerExt = DANGEROUS_EXTENSIONS.find(ext => pathLower.endsWith(ext));
+      if (dangerExt) {
+        add(24, `Path ends in an executable/installer file extension (${dangerExt}) — a common malware delivery pattern`, "high", "content");
+      } else if (/\.(pdf|docx?|xlsx?|jpg|png)\.(exe|scr|bat|js|vbs)$/i.test(pathLower)) {
+        add(26, "Path uses a double file extension to disguise an executable as a document/image", "high", "content");
+      }
+
+      // ---- MODEL: STRUCTURE — open-redirect parameter pointing off-domain ----
+      const params = parsed.searchParams;
+      let redirectHit = null;
+      for (const key of REDIRECT_PARAMS) {
+        if (params.has(key)) {
+          const val = params.get(key);
+          try {
+            const inner = new URL(val, parsed.origin);
+            if (inner.hostname && inner.hostname !== host) { redirectHit = { key, host: inner.hostname }; break; }
+          } catch (e) { /* not an absolute URL, ignore */ }
+        }
+      }
+      if (redirectHit) {
+        add(22, `Query parameter '${redirectHit.key}' redirects to a different domain (${redirectHit.host}) — classic open-redirect abuse`, "high", "structure");
+      }
+
+      // ---- MODEL: STRUCTURE — excessive query parameter count ----
+      const paramCount = [...params.keys()].length;
+      if (paramCount >= 8) {
+        add(6, `URL carries an unusually high number of query parameters (${paramCount})`, "low", "structure");
+      }
+
+      // ---- MODEL: ENCODING — base64-like parameter value ----
+      const b64Param = [...params.entries()].find(([k, v]) => v.length >= 16 && /^[A-Za-z0-9+/_-]+={0,2}$/.test(v) && entropy(v) > 3.5);
+      if (b64Param) {
+        add(9, `Query parameter '${b64Param[0]}' looks base64/obfuscated-encoded — may hide the real destination or payload`, "low", "encoding");
+      }
+
+      // ---- MODEL: ENCODING — double URL-encoding ----
+      if (/%25[0-9a-f]{2}/i.test(parsed.pathname + parsed.search)) {
+        add(14, "Double URL-encoded characters detected (e.g. %25XX) — can smuggle payloads past naive filters", "medium", "encoding");
+      }
+
+      // ---- MODEL: ENCODING — punycode / homograph ----
+      if (host.startsWith("xn--") || host.includes(".xn--")) {
+        add(20, "Domain uses Punycode (xn--) encoding — can be used to spoof lookalike characters (IDN homograph attack)", "high", "encoding");
+      } else if (/[^\x00-\x7F]/.test(rawUrl)) {
+        add(15, "Original input contains non-ASCII characters — the browser silently converts these to Punycode; visually verify the real domain", "medium", "encoding");
+      }
+
+      // ---- MODEL: STRUCTURE — non-standard port ----
       if (parsed.port && !["80", "443", ""].includes(parsed.port)) {
-        add(6, `Non-standard port specified (${parsed.port})`, "low");
+        add(6, `Non-standard port specified (${parsed.port})`, "low", "structure");
       }
 
       const score = Math.min(100, findings.reduce((s, f) => s + f.points, 0));
+
+      const catTotals = { domain: 0, structure: 0, content: 0, encoding: 0 };
+      for (const f of findings) catTotals[f.cat] = (catTotals[f.cat] || 0) + f.points;
 
       let verdict, verdictColor;
       if (score >= 70) { verdict = "HIGH RISK — likely phishing"; verdictColor = "var(--red)"; }
@@ -778,13 +1024,45 @@
       else if (score >= 15) { verdict = "LOW RISK — minor red flags"; verdictColor = "var(--amber)"; }
       else { verdict = "LIKELY SAFE — no significant indicators"; verdictColor = "var(--green)"; }
 
+      const sortedFindings = findings.sort((a, b) => b.points - a.points);
+
       return {
         score,
         verdict,
         verdictColor,
-        findings: findings.sort((a, b) => b.points - a.points),
+        findings: sortedFindings,
+        catTotals,
+        aiSummary: buildAiSummary(sortedFindings, catTotals, score),
+        confidence: buildConfidence(sortedFindings, score),
         displayUrl: url
       };
+    }
+
+    // Generates a natural-language, template-based "AI analysis" paragraph
+    // from the structured findings — deterministic, not a live model call.
+    function buildAiSummary(findings, catTotals, score) {
+      const total = findings.length;
+      if (total === 0) {
+        return `No indicators fired across any of the ${TOTAL_CHECKS}+ checks spanning all four detection models — domain reputation, structural, lexical, and encoding analysis all came back clean. This URL is structurally consistent with a legitimate link, though structural analysis alone can't confirm page content or intent.`;
+      }
+      const top = findings[0];
+      const activeCats = Object.entries(catTotals).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+      const dominant = activeCats[0];
+      let lead;
+      if (score >= 70) lead = "Sentinel flags this URL as high risk.";
+      else if (score >= 40) lead = "Sentinel flags this URL as suspicious.";
+      else if (score >= 15) lead = "Sentinel found minor red flags on this URL.";
+      else lead = "Sentinel found only marginal anomalies on this URL.";
+      const others = total - 1;
+      return `${lead} ${total} signal${total > 1 ? "s" : ""} fired across ${activeCats.length} of 4 detection models, weighted most heavily toward ${CATEGORY_LABELS[dominant[0]]}. The strongest indicator: ${top.reason}${others > 0 ? `, alongside ${others} other supporting signal${others > 1 ? "s" : ""}.` : "."}`;
+    }
+
+    function buildConfidence(findings, score) {
+      const n = findings.length;
+      if (n === 0) return "high — 0 signals triggered";
+      if (score >= 70) return `high — ${n} corroborating signal${n > 1 ? "s" : ""}`;
+      if (score >= 40) return `moderate — ${n} signal${n > 1 ? "s" : ""}, mixed severity`;
+      return `low-to-moderate — ${n} minor signal${n > 1 ? "s" : ""} only`;
     }
 
     // ============================================================
@@ -833,6 +1111,21 @@
       const offset = circumference - (circumference * result.score / 100);
       arc.style.stroke = result.verdictColor;
       requestAnimationFrame(() => { arc.style.strokeDashoffset = offset; });
+
+      document.getElementById('aiSummaryText').textContent = result.aiSummary;
+      document.getElementById('confText').textContent = `confidence: ${result.confidence}`;
+      document.getElementById('signalCount').textContent = result.findings.length;
+
+      const CAT_CAP = 45; // points at which a category bar reads "full"
+      for (const cat of Object.keys(CATEGORY_LABELS)) {
+        const val = result.catTotals[cat] || 0;
+        const pct = Math.min(100, Math.round((val / CAT_CAP) * 100));
+        const fill = document.getElementById(`catBar-${cat}`);
+        const num = document.getElementById(`catNum-${cat}`);
+        num.textContent = val;
+        fill.style.background = pct >= 60 ? 'var(--red)' : pct >= 25 ? 'var(--amber)' : 'var(--green)';
+        requestAnimationFrame(() => { fill.style.width = pct + '%'; });
+      }
 
       const container = document.getElementById('findings');
       container.innerHTML = "";
@@ -888,12 +1181,19 @@
     function copyReport() {
       if (!lastResult) return;
       const lines = [
-        `URL Threat Scanner Report`,
+        `Sentinel AI — URL Scanner Report`,
         `Target: ${lastResult.displayUrl}`,
         `Score: ${lastResult.score}/100`,
         `Verdict: ${lastResult.verdict}`,
+        `Confidence: ${lastResult.confidence}`,
         ``,
-        `Findings:`,
+        `AI Summary:`,
+        `  ${lastResult.aiSummary}`,
+        ``,
+        `Category Breakdown:`,
+        ...Object.entries(CATEGORY_LABELS).map(([k, label]) => `  ${label}: ${lastResult.catTotals[k] || 0}`),
+        ``,
+        `Findings (${lastResult.findings.length}):`,
         ...(lastResult.findings.length
           ? lastResult.findings.map(f => `  [${f.sev.toUpperCase()}] +${f.points}  ${f.reason}`)
           : ['  None detected'])
