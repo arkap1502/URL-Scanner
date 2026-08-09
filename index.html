@@ -77,6 +77,56 @@
       backface-visibility: hidden;
     }
 
+    #hudRings {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      opacity: 0.55;
+    }
+
+    #hudRings svg {
+      width: min(78vw, 78vh, 780px);
+      height: min(78vw, 78vh, 780px);
+      overflow: visible;
+    }
+
+    .hud-ring {
+      transform-box: fill-box;
+      transform-origin: center;
+      filter: drop-shadow(0 0 6px rgba(0,229,255,0.45));
+    }
+
+    .hud-ring-cw-slow { animation: hudSpin 90s linear infinite; }
+    .hud-ring-ccw-med { animation: hudSpinRev 55s linear infinite; }
+    .hud-ring-cw-fast { animation: hudSpin 32s linear infinite; }
+
+    @keyframes hudSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes hudSpinRev {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(-360deg); }
+    }
+
+    @media (max-width: 600px) {
+      #hudRings { opacity: 0.4; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hud-ring-cw-slow, .hud-ring-ccw-med, .hud-ring-cw-fast {
+        animation: none;
+      }
+    }
+
     .wrap{
       width: 100%;
       max-width: none;
@@ -751,6 +801,32 @@
 <body>
   <div id="bgImage"></div>
   <div id="bgOverlay"></div>
+  <div id="hudRings" aria-hidden="true">
+    <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+      <g class="hud-ring hud-ring-cw-slow">
+        <circle cx="300" cy="300" r="270" fill="none" stroke="rgba(0,229,255,0.35)" stroke-width="1"
+          stroke-dasharray="2 6" />
+      </g>
+      <g class="hud-ring hud-ring-ccw-med">
+        <circle cx="300" cy="300" r="230" fill="none" stroke="rgba(0,229,255,0.3)" stroke-width="1.5"
+          stroke-dasharray="40 8 4 8" />
+        <circle cx="300" cy="30" r="4" fill="rgba(0,229,255,0.55)" />
+        <circle cx="300" cy="570" r="4" fill="rgba(0,229,255,0.55)" />
+      </g>
+      <g class="hud-ring hud-ring-cw-fast">
+        <circle cx="300" cy="300" r="185" fill="none" stroke="rgba(0,229,255,0.4)" stroke-width="1"
+          stroke-dasharray="1 5" />
+      </g>
+      <g class="hud-ring hud-ring-ccw-med">
+        <circle cx="300" cy="300" r="140" fill="none" stroke="rgba(255,45,45,0.28)" stroke-width="1.5"
+          stroke-dasharray="18 90" />
+      </g>
+      <g class="hud-ring hud-ring-cw-slow">
+        <circle cx="300" cy="300" r="90" fill="none" stroke="rgba(0,229,255,0.5)" stroke-width="1"
+          stroke-dasharray="6 4" />
+      </g>
+    </svg>
+  </div>
   <div class="wrap">
     <header>
       <div class="eyebrow">AI Threat Intelligence Engine · Client-Side</div>
@@ -912,24 +988,6 @@
         prev = cur;
       }
       return prev[b.length];
-    }
-
-    // Animates the gauge's numeric readout counting up from `from` to `to`,
-    // eased to land in sync with the ring's CSS stroke-dashoffset transition.
-    function animateNumber(el, from, to, duration) {
-      if (el._scoreAnimFrame) cancelAnimationFrame(el._scoreAnimFrame);
-      const start = performance.now();
-      function tick(now) {
-        const t = Math.min((now - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
-        el.textContent = Math.round(from + (to - from) * eased);
-        if (t < 1) {
-          el._scoreAnimFrame = requestAnimationFrame(tick);
-        } else {
-          el.textContent = to;
-        }
-      }
-      el._scoreAnimFrame = requestAnimationFrame(tick);
     }
 
     function entropy(s) {
@@ -1222,7 +1280,7 @@
       document.getElementById('urlEcho').textContent = result.displayUrl;
 
       const scoreNum = document.getElementById('scoreNum');
-      animateNumber(scoreNum, 0, result.score, 800);
+      scoreNum.textContent = result.score;
 
       const verdictEl = document.getElementById('verdictText');
       verdictEl.textContent = result.verdict;
