@@ -19,8 +19,8 @@ open index.html      # macOS
 
 ## What it does
 
-Type or paste a URL into the scan bar (or click one of the example chips)
-and hit **SCAN**. Sentinel will:
+Type or paste a URL into the scan bar (or click one of the example chips,
+or upload a QR image) and hit **SCAN**. Sentinel will:
 
 1. Parse the URL and normalize it (adding `http://` if no scheme is given).
 2. Run it through four weighted detection models (below).
@@ -28,8 +28,18 @@ and hit **SCAN**. Sentinel will:
    DANGEROUS, etc.), a plain-English AI-style summary, a per-category
    breakdown, and a detailed list of every triggered finding with its
    severity and point value.
-4. Log the scan to a "recent" history strip you can click back into.
-5. Let you copy the full report as plain text via the **COPY** button.
+4. Explain **attacker intent** instead of just saying "malicious" —
+   credential harvesting, brand impersonation, malware delivery,
+   redirect laundering, or filter evasion, each with confidence + why.
+5. Tell a plain-English **attack story**, flag **brand impersonation**
+   (claims-vs-actual), warn on **credential traps**, and show a
+   **risk heatmap** of which URL parts look bad.
+6. Show a **safe preview** (URL anatomy, nothing fetched), **predicted
+   page behaviors**, and an **evidence timeline** of what ran in order.
+7. Log the scan to a "recent" history strip you can click back into, and
+   track **per-URL risk history** in `localStorage` (this browser only).
+8. Let you copy the full report as plain text via the **COPY** button
+   (now includes intent, story, impersonation, and behaviors).
 
 ## Detection models
 
@@ -54,6 +64,9 @@ score and verdict.
 ## Interface
 
 - **Scan bar** — paste a URL, press Enter or click SCAN.
+- **QR → URL → Risk** — "Scan QR image" decodes a QR photo locally
+  (native `BarcodeDetector`) and auto-scans the URL. Works in
+  Chrome/Edge; other browsers get a notice to paste the link manually.
 - **Example chips** — one-click samples covering typosquatting, raw/hex
   IPs, punycode, shorteners, hyphenated fake-brand domains, and
   open-redirect params.
@@ -61,6 +74,21 @@ score and verdict.
   click a chip to re-run that scan.
 - **Score gauge** — an animated ring + counting number (0–100) that
   eases into place in sync with the ring's fill animation.
+- **Phishing Intent Engine** — intent cards with confidence
+  (credential harvesting, brand impersonation, malware, redirect
+  laundering, filter evasion).
+- **Attack story + credential warning + impersonation card** —
+  plain-English "what could happen", a do-not-log-in banner on
+  password-theft patterns, and a claims-vs-actual brand comparison.
+- **Risk heatmap** — URL split into scheme/subdomain/domain/TLD/port/
+  path/query tokens, colored high/med/ok.
+- **Safe preview** — URL anatomy table (protocol, host, path, query,
+  redirect target). Nothing is fetched or rendered.
+- **Predicted behaviors + evidence timeline** — heuristic behavior
+  predictions (fake form, forced download, redirect hop, …) and the
+  ordered check stages with hit counts.
+- **URL risk history** — per-URL trail (`localStorage`, this browser
+  only): first → now, last-change delta, full score trail.
 - **Category bars** — four bars showing how much each model contributed
   to the score.
 - **Findings list** — every triggered check, its severity badge, and its
@@ -72,8 +100,14 @@ score and verdict.
 
 - Plain HTML/CSS/vanilla JavaScript — no frameworks, no build tooling,
   no external JS dependencies.
+- QR decoding uses the native `BarcodeDetector` API where available —
+  no library shipped. Deliberately **no OpenCV**: it adds ~8MB for a
+  problem native APIs + (optionally) a ~50KB jsQR fallback solve.
+  OpenCV only makes sense later for damaged/blurry QR preprocessing.
 - Google Fonts (`JetBrains Mono`, `Inter`) loaded via `@import` for the
   terminal/console aesthetic.
+- `localStorage` key `sentinel-risk-history-v1` stores per-URL score
+  trails (this browser only, last 12 scans per URL).
 - Everything (styles, data tables, detection logic, UI rendering) lives
   in the one `index.html` file.
 
@@ -95,8 +129,11 @@ the `<script>` block, so it's easy to extend:
 - `DANGEROUS_EXTENSIONS` — risky file extensions
 - `REDIRECT_PARAMS` — query-param names checked for open-redirect abuse
 
-The core scoring logic lives in `analyze(rawUrl)`, and the visual
-counting/gauge animations live in `animateNumber()` and `renderReport()`.
+The core scoring logic lives in `analyze(rawUrl)`; intent/story/heatmap/
+timeline/behavior builders (`buildIntents`, `buildAttackStory`,
+`buildHeatTokens`, `buildTimeline`, `buildBehaviors`,
+`buildCredentialWarning`) sit right after it, and all DOM rendering lives
+in `renderReport()` + the `renderX()` helpers.
 
 ## Disclaimer
 
